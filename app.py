@@ -109,29 +109,24 @@ html, body, [class*="css"] { font-family: 'Source Sans 3', sans-serif; }
 
 @st.cache_resource
 def get_client():
-    """Conecta con Google Sheets usando secrets de Streamlit."""
     creds_dict = st.secrets["gcp_service_account"]
     creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
     return gspread.authorize(creds)
 
-@st.cache_resource
 def get_spreadsheet():
-    client = get_client()
-    return client.open_by_key(SHEET_ID)
+    return get_client().open_by_key(SHEET_ID)
 
+@st.cache_data(ttl=30)
 def get_materias():
-    sh = get_spreadsheet()
-    return [ws.title for ws in sh.worksheets()]
+    return [ws.title for ws in get_spreadsheet().worksheets()]
 
+@st.cache_data(ttl=30)
 def get_estudiantes(materia):
     try:
-        sh  = get_spreadsheet()
-        ws  = sh.worksheet(materia)
-        data = ws.get_all_records()
+        data = get_spreadsheet().worksheet(materia).get_all_records()
         if not data:
             return pd.DataFrame(columns=["Nombre", "Nota", "Fecha", "Letra"])
         df = pd.DataFrame(data)
-        # Asegurar columnas correctas
         for col in ["Nombre", "Nota", "Fecha", "Letra"]:
             if col not in df.columns:
                 df[col] = ""
@@ -140,39 +135,38 @@ def get_estudiantes(materia):
     except:
         return pd.DataFrame(columns=["Nombre", "Nota", "Fecha", "Letra"])
 
+def _limpiar_cache():
+    get_materias.clear()
+    get_estudiantes.clear()
+
 def guardar_estudiantes(materia, df):
-    sh = get_spreadsheet()
+    spr = get_spreadsheet()
     try:
-        ws = sh.worksheet(materia)
+        ws = spr.worksheet(materia)
         ws.clear()
     except:
-        ws = sh.add_worksheet(title=materia, rows=500, cols=10)
-    # Encabezados + datos
+        ws = spr.add_worksheet(title=materia, rows=500, cols=10)
     rows = [["Nombre", "Nota", "Fecha", "Letra"]]
     for _, row in df.iterrows():
         rows.append([str(row["Nombre"]), int(row["Nota"]), str(row["Fecha"]), str(row["Letra"])])
     ws.update(rows, "A1")
-    # Limpiar cache para refrescar datos
-    get_spreadsheet.clear()
+    _limpiar_cache()
 
 def crear_materia(nombre):
-    sh = get_materias()
-    if nombre not in sh:
-        spr = get_spreadsheet()
-        ws  = spr.add_worksheet(title=nombre, rows=500, cols=10)
-        ws.update([["Nombre", "Nota", "Fecha", "Letra"]], "A1")
-        get_spreadsheet.clear()
-        return True
-    return False
-
-def eliminar_materia(nombre):
-    materias = get_materias()
-    if len(materias) <= 1:
+    if nombre in get_materias():
         return False
     spr = get_spreadsheet()
-    ws  = spr.worksheet(nombre)
-    spr.del_worksheet(ws)
-    get_spreadsheet.clear()
+    ws  = spr.add_worksheet(title=nombre, rows=500, cols=10)
+    ws.update([["Nombre", "Nota", "Fecha", "Letra"]], "A1")
+    _limpiar_cache()
+    return True
+
+def eliminar_materia(nombre):
+    if len(get_materias()) <= 1:
+        return False
+    spr = get_spreadsheet()
+    spr.del_worksheet(spr.worksheet(nombre))
+    _limpiar_cache()
     return True
 
 def nota_a_letra(nota):
