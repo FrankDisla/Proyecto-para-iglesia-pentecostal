@@ -316,9 +316,53 @@ with st.sidebar:
     except:
         st.markdown("Conectando…")
     st.markdown('<div class="gold-divider"></div>', unsafe_allow_html=True)
-    st.markdown("""
+    # Versículo del día — rota automáticamente cada día
+    versiculos = [
+        ("Instruye al sabio, y se hará más sabio.", "Proverbios 9:9"),
+        ("Todo lo puedo en Cristo que me fortalece.", "Filipenses 4:13"),
+        ("El Señor es mi pastor, nada me faltará.", "Salmos 23:1"),
+        ("Porque de tal manera amó Dios al mundo...", "Juan 3:16"),
+        ("Confía en el Señor con todo tu corazón.", "Proverbios 3:5"),
+        ("Busca primero el reino de Dios.", "Mateo 6:33"),
+        ("El temor del Señor es el principio de la sabiduría.", "Proverbios 9:10"),
+        ("Lámpara es tu palabra a mis pies.", "Salmos 119:105"),
+        ("Jehová es mi luz y mi salvación.", "Salmos 27:1"),
+        ("Esfuérzate y sé valiente.", "Josué 1:9"),
+        ("El justo vivirá por la fe.", "Romanos 1:17"),
+        ("Dios es amor.", "1 Juan 4:8"),
+        ("Yo soy el camino, la verdad y la vida.", "Juan 14:6"),
+        ("Fiel es el que os llama.", "1 Tesalonicenses 5:24"),
+        ("El Señor tu Dios está contigo.", "Sofonías 3:17"),
+        ("Mas los que esperan en Jehová tendrán nuevas fuerzas.", "Isaías 40:31"),
+        ("Amarás al Señor tu Dios con todo tu corazón.", "Mateo 22:37"),
+        ("La gracia del Señor sea con todos vosotros.", "Apocalipsis 22:21"),
+        ("Bienaventurados los de limpio corazón.", "Mateo 5:8"),
+        ("Encomienda al Señor tu camino.", "Salmos 37:5"),
+        ("Sed fuertes y valientes. No temáis.", "Deuteronomio 31:6"),
+        ("Tu fe te ha salvado.", "Lucas 7:50"),
+        ("El amor nunca deja de ser.", "1 Corintios 13:8"),
+        ("Den gracias en todo.", "1 Tesalonicenses 5:18"),
+        ("Conocerán la verdad y la verdad los hará libres.", "Juan 8:32"),
+        ("No os afanéis por nada.", "Filipenses 4:6"),
+        ("Yo estoy con vosotros todos los días.", "Mateo 28:20"),
+        ("El que comenzó en vosotros la buena obra, la perfeccionará.", "Filipenses 1:6"),
+        ("Porque yo sé los planes que tengo para vosotros.", "Jeremías 29:11"),
+        ("Gracia y paz a vosotros de parte de Dios.", "Romanos 1:7"),
+        ("El Señor es bueno; para siempre es su misericordia.", "Salmos 100:5"),
+        ("Pedid y se os dará.", "Mateo 7:7"),
+        ("Jesús dijo: Yo soy la resurrección y la vida.", "Juan 11:25"),
+        ("Ama a tu prójimo como a ti mismo.", "Mateo 22:39"),
+        ("El Señor bendiga tu salida y tu entrada.", "Salmos 121:8"),
+        ("La fe es la certeza de lo que se espera.", "Hebreos 11:1"),
+        ("Dios nos dio espíritu de poder, amor y dominio propio.", "2 Timoteo 1:7"),
+    ]
+    from datetime import date
+    idx = date.today().timetuple().tm_yday % len(versiculos)
+    texto, referencia = versiculos[idx]
+    st.markdown(f"""
     <div class="versiculo">
-    "Instruye al sabio, y se hará más sabio"<br><strong>— Proverbios 9:9</strong>
+    <div style="font-size:.68rem;color:#c9a84c;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">✝ Versículo del día</div>
+    "{texto}"<br><strong>— {referencia}</strong>
     </div>""", unsafe_allow_html=True)
 
 # ── DASHBOARD ─────────────────────────────────────────────────────────────────
